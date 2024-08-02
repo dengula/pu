@@ -6,23 +6,68 @@
     <title>API Interface</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
         .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
             max-width: 600px;
-            margin: auto;
+            width: 100%;
         }
-        input, button {
-            margin: 10px 0;
-            padding: 10px;
+        h1, h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
             font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
         }
         .error {
-            color: red;
+            background-color: #f8d7da;
+            color: #721c24;
         }
         .success {
-            color: green;
+            background-color: #d4edda;
+            color: #155724;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
         }
     </style>
 </head>
@@ -39,19 +84,18 @@
         <h2>Add Data</h2>
         <input type="text" id="dataInput" placeholder="Enter data (10 characters)">
         <button onclick="addData()">Add Data</button>
-        <div id="addResult" class="error"></div>
+        <div id="addResult" class="result"></div>
         
         <!-- Delete Data -->
         <h2>Delete Data</h2>
         <input type="text" id="deleteInput" placeholder="Enter data to delete">
         <button onclick="deleteData()">Delete Data</button>
-        <div id="deleteResult" class="error"></div>
+        <div id="deleteResult" class="result"></div>
     </div>
 
     <script>
         const apiUrl = 'https://pu-amber.vercel.app/home/data';
 
-        // Fetch Data
         async function fetchData() {
             try {
                 const response = await fetch(apiUrl);
@@ -63,24 +107,16 @@
             }
         }
 
-        // Add Data
         async function addData() {
             const data = document.getElementById('dataInput').value;
             if (!data || data.length !== 10) {
                 document.getElementById('addResult').textContent = 'Data must be exactly 10 characters long.';
+                document.getElementById('addResult').classList.add('error');
+                document.getElementById('addResult').classList.remove('success');
                 return;
             }
 
             try {
-                const checkResponse = await fetch(apiUrl);
-                if (!checkResponse.ok) throw new Error('Network response was not ok');
-                const existingData = await checkResponse.json();
-                
-                if (existingData.includes(data)) {
-                    document.getElementById('addResult').textContent = 'Data already exists.';
-                    return;
-                }
-
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -98,11 +134,12 @@
             }
         }
 
-        // Delete Data
         async function deleteData() {
             const data = document.getElementById('deleteInput').value;
             if (!data) {
                 document.getElementById('deleteResult').textContent = 'Data cannot be empty.';
+                document.getElementById('deleteResult').classList.add('error');
+                document.getElementById('deleteResult').classList.remove('success');
                 return;
             }
 
