@@ -11,7 +11,7 @@ router.get('/data', (req, res) => {
 // API POST để thêm dữ liệu
 router.post('/data', (req, res) => {
   const newData = req.body.data;
-  if (typeof newData === 'string' && newData.length === 10) {
+  if (typeof newData === 'string') {
     data.push(newData);
     res.status(201).json({ message: 'Data added successfully.' });
   } else {
