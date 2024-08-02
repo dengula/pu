@@ -5,7 +5,7 @@ const home = require("./routes/home");
 // Middlewares
 const app = express();
 app.use(express.json());
-
+app.use(express.static(path.join(__dirname, 'public')));
 // Routes
 app.use("/home", home);
 
