@@ -1,115 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>API Interface</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input[type="text"] {
-      width: 100%;
-      padding: 8px;
-      box-sizing: border-box;
-    }
-    button {
-      padding: 10px 15px;
-      border: none;
-      background-color: #007BFF;
-      color: white;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0056b3;
-    }
-    .result {
-      margin-top: 20px;
-      padding: 10px;
-      border: 1px solid #ddd;
-      background-color: #f9f9f9;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        .error {
+            color: red;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>API Interface</h1>
-    <div class="form-group">
-      <label for="data">Data (10 characters):</label>
-      <input type="text" id="data" maxlength="10">
+    <div class="container">
+        <h1>API Interface</h1>
+        <h2>View Data</h2>
+        <button onclick="fetchData()">Fetch Data</button>
+        <pre id="dataDisplay"></pre>
+        
+        <h2>Add Data</h2>
+        <input type="text" id="dataInput" placeholder="Enter data">
+        <button onclick="addData()">Add Data</button>
+        <div id="addResult" class="error"></div>
+        
+        <h2>Delete Data</h2>
+        <input type="text" id="deleteInput" placeholder="Enter data to delete">
+        <button onclick="deleteData()">Delete Data</button>
+        <div id="deleteResult" class="error"></div>
     </div>
-    <button onclick="postData()">POST Data</button>
-    <button onclick="getData()">GET Data</button>
-    <button onclick="deleteData()">DELETE Data</button>
-    <div class="result" id="result"></div>
-  </div>
 
-  <script>
-    const apiUrl = 'https://pu-amber.vercel.app/home/data';
+    <script>
+        const apiUrl = 'https://pu-amber.vercel.app/home/data';
 
-    async function postData() {
-      const data = document.getElementById('data').value;
-      if (data.length !== 10) {
-        alert('Data must be exactly 10 characters long.');
-        return;
-      }
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ data })
-        });
-        const result = await response.json();
-        document.getElementById('result').innerText = 'POST Response: ' + JSON.stringify(result);
-      } catch (error) {
-        document.getElementById('result').innerText = 'Error: ' + error;
-      }
-    }
+        async function fetchData() {
+            try {
+                const response = await fetch(apiUrl);
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                document.getElementById('dataDisplay').textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                document.getElementById('dataDisplay').textContent = `Error: ${error.message}`;
+            }
+        }
 
-    async function getData() {
-      try {
-        const response = await fetch(apiUrl, { method: 'GET' });
-        const result = await response.json();
-        document.getElementById('result').innerText = 'GET Response: ' + JSON.stringify(result);
-      } catch (error) {
-        document.getElementById('result').innerText = 'Error: ' + error;
-      }
-    }
+        async function addData() {
+            const data = document.getElementById('dataInput').value;
+            if (!data) {
+                document.getElementById('addResult').textContent = 'Data cannot be empty.';
+                return;
+            }
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                document.getElementById('addResult').textContent = result.message || 'Data added successfully.';
+            } catch (error) {
+                document.getElementById('addResult').textContent = `Error: ${error.message}`;
+            }
+        }
 
-    async function deleteData() {
-      const data = document.getElementById('data').value;
-      if (data.length !== 10) {
-        alert('Data must be exactly 10 characters long.');
-        return;
-      }
-      try {
-        const response = await fetch(apiUrl, {
-          method: 'DELETE',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ data })
-        });
-        const result = await response.json();
-        document.getElementById('result').innerText = 'DELETE Response: ' + JSON.stringify(result);
-      } catch (error) {
-        document.getElementById('result').innerText = 'Error: ' + error;
-      }
-    }
-  </script>
+        async function deleteData() {
+            const data = document.getElementById('deleteInput').value;
+            if (!data) {
+                document.getElementById('deleteResult').textContent = 'Data cannot be empty.';
+                return;
+            }
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ data })
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const result = await response.json();
+                document.getElementById('deleteResult').textContent = result.message || 'Data deleted successfully.';
+            } catch (error) {
+                document.getElementById('deleteResult').textContent = `Error: ${error.message}`;
+            }
+        }
+    </script>
 </body>
 </html>
