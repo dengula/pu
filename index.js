@@ -7,7 +7,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 // Routes
-app.use("/home", home);
+app.use("/add", home);
 
 // connection
 const port = process.env.PORT || 9001;
