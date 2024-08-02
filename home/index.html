@@ -82,7 +82,7 @@
         
         <!-- Add Data -->
         <h2>Add Data</h2>
-        <input type="text" id="dataInput" placeholder="Enter data (10 characters)">
+        <input type="text" id="dataInput" placeholder="Enter data">
         <button onclick="addData()">Add Data</button>
         <div id="addResult" class="result"></div>
         
@@ -109,8 +109,8 @@
 
         async function addData() {
             const data = document.getElementById('dataInput').value;
-            if (!data || data.length !== 10) {
-                document.getElementById('addResult').textContent = 'Data must be exactly 10 characters long.';
+            if (!data) {
+                document.getElementById('addResult').textContent = 'Data cannot be empty.';
                 document.getElementById('addResult').classList.add('error');
                 document.getElementById('addResult').classList.remove('success');
                 return;
