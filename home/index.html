@@ -82,13 +82,15 @@
         
         <!-- Add Data -->
         <h2>Add Data</h2>
-        <input type="text" id="dataInput" placeholder="Enter data">
+        <input type="text" id="machineName" placeholder="Machine Name" />
+        <input type="text" id="ipAddress" placeholder="IP Address" />
+        <input type="text" id="country" placeholder="Country" />
         <button onclick="addData()">Add Data</button>
         <div id="addResult" class="result"></div>
         
         <!-- Delete Data -->
         <h2>Delete Data</h2>
-        <input type="text" id="deleteInput" placeholder="Enter data to delete">
+        <input type="text" id="deleteInput" placeholder="Enter data to delete" />
         <button onclick="deleteData()">Delete Data</button>
         <div id="deleteResult" class="result"></div>
     </div>
@@ -108,14 +110,19 @@
         }
 
         async function addData() {
-            const data = document.getElementById('dataInput').value;
-            if (!data) {
-                document.getElementById('addResult').textContent = 'Data cannot be empty.';
-                document.getElementById('addResult').classList.add('error');
-                document.getElementById('addResult').classList.remove('success');
+            const machineName = document.getElementById('machineName').value.trim();
+            const ipAddress = document.getElementById('ipAddress').value.trim();
+            const country = document.getElementById('country').value.trim();
+            const resultDiv = document.getElementById('addResult');
+
+            if (!machineName || !ipAddress || !country) {
+                resultDiv.textContent = 'All fields are required.';
+                resultDiv.classList.add('error');
+                resultDiv.classList.remove('success');
                 return;
             }
 
+            const data = `${machineName}|${ipAddress}|${country}`;
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -124,22 +131,24 @@
                 });
                 if (!response.ok) throw new Error('Network response was not ok');
                 const result = await response.json();
-                document.getElementById('addResult').textContent = result.message || 'Data added successfully.';
-                document.getElementById('addResult').classList.add('success');
-                document.getElementById('addResult').classList.remove('error');
+                resultDiv.textContent = result.message || 'Data added successfully.';
+                resultDiv.classList.add('success');
+                resultDiv.classList.remove('error');
             } catch (error) {
-                document.getElementById('addResult').textContent = `Error: ${error.message}`;
-                document.getElementById('addResult').classList.add('error');
-                document.getElementById('addResult').classList.remove('success');
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.classList.add('error');
+                resultDiv.classList.remove('success');
             }
         }
 
         async function deleteData() {
-            const data = document.getElementById('deleteInput').value;
+            const data = document.getElementById('deleteInput').value.trim();
+            const resultDiv = document.getElementById('deleteResult');
+
             if (!data) {
-                document.getElementById('deleteResult').textContent = 'Data cannot be empty.';
-                document.getElementById('deleteResult').classList.add('error');
-                document.getElementById('deleteResult').classList.remove('success');
+                resultDiv.textContent = 'Data cannot be empty.';
+                resultDiv.classList.add('error');
+                resultDiv.classList.remove('success');
                 return;
             }
 
@@ -151,13 +160,13 @@
                 });
                 if (!response.ok) throw new Error('Network response was not ok');
                 const result = await response.json();
-                document.getElementById('deleteResult').textContent = result.message || 'Data deleted successfully.';
-                document.getElementById('deleteResult').classList.add('success');
-                document.getElementById('deleteResult').classList.remove('error');
+                resultDiv.textContent = result.message || 'Data deleted successfully.';
+                resultDiv.classList.add('success');
+                resultDiv.classList.remove('error');
             } catch (error) {
-                document.getElementById('deleteResult').textContent = `Error: ${error.message}`;
-                document.getElementById('deleteResult').classList.add('error');
-                document.getElementById('deleteResult').classList.remove('success');
+                resultDiv.textContent = `Error: ${error.message}`;
+                resultDiv.classList.add('error');
+                resultDiv.classList.remove('success');
             }
         }
     </script>
