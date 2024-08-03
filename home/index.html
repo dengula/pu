@@ -3,165 +3,133 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Interface</title>
+    <title>API Manager</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f9;
-            color: #333;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            padding: 20px;
         }
         .container {
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: auto;
             padding: 20px;
-            max-width: 600px;
-            width: 100%;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-        h1, h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
+        h1 {
+            margin-top: 0;
+            color: #333;
+        }
+        form {
             margin-bottom: 20px;
         }
-        button {
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        button:hover {
-            background-color: #2980b9;
-        }
-        input[type="text"] {
-            width: calc(100% - 22px);
+        input, button {
             padding: 10px;
-            margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            margin-bottom: 10px;
+            width: calc(100% - 22px);
         }
-        .result {
-            margin-top: 10px;
+        button {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #result {
             padding: 10px;
+            border: 1px solid #ccc;
             border-radius: 4px;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        pre {
-            background-color: #f5f5f5;
-            padding: 10px;
-            border-radius: 4px;
-            overflow-x: auto;
+            background: #f9f9f9;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>API Interface</h1>
-        
-        <!-- View Data -->
-        <h2>View Data</h2>
-        <button onclick="fetchData()">Fetch Data</button>
-        <pre id="dataDisplay"></pre>
-        
-        <!-- Add Data -->
-        <h2>Add Data</h2>
-        <input type="text" id="machineName" placeholder="Machine Name" />
-        <button onclick="addData()">Add Data</button>
-        <div id="addResult" class="result"></div>
-        
-        <!-- Delete Data -->
-        <h2>Delete Data</h2>
-        <input type="text" id="deleteInput" placeholder="Enter name to delete" />
-        <button onclick="deleteData()">Delete Data</button>
-        <div id="deleteResult" class="result"></div>
+        <h1>API Manager</h1>
+        <form id="get-form">
+            <button type="button" onclick="getData()">Get Data</button>
+        </form>
+
+        <form id="post-form">
+            <h2>Add Device</h2>
+            <input type="text" id="post-name" placeholder="Name" required>
+            <input type="text" id="post-ip" placeholder="IP" required>
+            <input type="text" id="post-country" placeholder="Country" required>
+            <button type="button" onclick="postData()">Add Device</button>
+        </form>
+
+        <form id="delete-form">
+            <h2>Delete Device</h2>
+            <input type="text" id="delete-name" placeholder="Name" required>
+            <button type="button" onclick="deleteData()">Delete Device</button>
+        </form>
+
+        <div id="result"></div>
     </div>
 
     <script>
-        const apiUrl = 'https://ap-zeta.vercel.app/data';
+        const BASE_URL = "https://ap-zeta.vercel.app";
 
-        async function fetchData() {
+        async function getData() {
             try {
-                const response = await fetch(apiUrl);
-                if (!response.ok) throw new Error('Network response was not ok');
+                const response = await fetch(`${BASE_URL}/data`);
                 const data = await response.json();
-                document.getElementById('dataDisplay').textContent = JSON.stringify(data, null, 2);
+                document.getElementById('result').innerText = `GET /data success: ${JSON.stringify(data)}`;
             } catch (error) {
-                document.getElementById('dataDisplay').textContent = `Error: ${error.message}`;
+                document.getElementById('result').innerText = `GET /data failed: ${error.message}`;
             }
         }
 
-        async function addData() {
-            const machineName = document.getElementById('machineName').value.trim();
-            const resultDiv = document.getElementById('addResult');
+        async function postData() {
+            const name = document.getElementById('post-name').value;
+            const ip = document.getElementById('post-ip').value;
+            const country = document.getElementById('post-country').value;
 
-            if (!machineName) {
-                resultDiv.textContent = 'Machine name is required.';
-                resultDiv.classList.add('error');
-                resultDiv.classList.remove('success');
-                return;
-            }
+            const payload = {
+                name: `${name}|${ip}|${country}`
+            };
 
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${BASE_URL}/data`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: machineName })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
                 });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const result = await response.json();
-                resultDiv.textContent = result.message || 'Data added successfully.';
-                resultDiv.classList.add('success');
-                resultDiv.classList.remove('error');
+                const data = await response.json();
+                document.getElementById('result').innerText = `POST /data success: ${JSON.stringify(data)}`;
             } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
-                resultDiv.classList.add('error');
-                resultDiv.classList.remove('success');
+                document.getElementById('result').innerText = `POST /data failed: ${error.message}`;
             }
         }
 
         async function deleteData() {
-            const name = document.getElementById('deleteInput').value.trim();
-            const resultDiv = document.getElementById('deleteResult');
+            const name = document.getElementById('delete-name').value;
 
-            if (!name) {
-                resultDiv.textContent = 'Name is required.';
-                resultDiv.classList.add('error');
-                resultDiv.classList.remove('success');
-                return;
-            }
+            const payload = {
+                name: name
+            };
 
             try {
-                const response = await fetch(apiUrl, {
+                const response = await fetch(`${BASE_URL}/data`, {
                     method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
                 });
-                if (!response.ok) throw new Error('Network response was not ok');
-                const result = await response.json();
-                resultDiv.textContent = result.message || 'Data deleted successfully.';
-                resultDiv.classList.add('success');
-                resultDiv.classList.remove('error');
+                const data = await response.json();
+                document.getElementById('result').innerText = `DELETE /data success: ${JSON.stringify(data)}`;
             } catch (error) {
-                resultDiv.textContent = `Error: ${error.message}`;
-                resultDiv.classList.add('error');
-                resultDiv.classList.remove('success');
+                document.getElementById('result').innerText = `DELETE /data failed: ${error.message}`;
             }
         }
     </script>
