@@ -83,8 +83,6 @@
         <!-- Add Data -->
         <h2>Add Data</h2>
         <input type="text" id="machineName" placeholder="Machine Name" />
-        <input type="text" id="ipAddress" placeholder="IP Address" />
-        <input type="text" id="country" placeholder="Country" />
         <button onclick="addData()">Add Data</button>
         <div id="addResult" class="result"></div>
         
@@ -111,23 +109,20 @@
 
         async function addData() {
             const machineName = document.getElementById('machineName').value.trim();
-            const ipAddress = document.getElementById('ipAddress').value.trim();
-            const country = document.getElementById('country').value.trim();
             const resultDiv = document.getElementById('addResult');
 
-            if (!machineName || !ipAddress || !country) {
-                resultDiv.textContent = 'All fields are required.';
+            if (!machineName) {
+                resultDiv.textContent = 'Machine name is required.';
                 resultDiv.classList.add('error');
                 resultDiv.classList.remove('success');
                 return;
             }
 
-            const data = `${machineName}|${ipAddress}|${country}`;
             try {
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data })
+                    body: JSON.stringify({ name: machineName })
                 });
                 if (!response.ok) throw new Error('Network response was not ok');
                 const result = await response.json();
@@ -142,11 +137,11 @@
         }
 
         async function deleteData() {
-            const data = document.getElementById('deleteInput').value.trim();
+            const name = document.getElementById('deleteInput').value.trim();
             const resultDiv = document.getElementById('deleteResult');
 
-            if (!data) {
-                resultDiv.textContent = 'Data cannot be empty.';
+            if (!name) {
+                resultDiv.textContent = 'Name is required.';
                 resultDiv.classList.add('error');
                 resultDiv.classList.remove('success');
                 return;
@@ -156,7 +151,7 @@
                 const response = await fetch(apiUrl, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ data })
+                    body: JSON.stringify({ name })
                 });
                 if (!response.ok) throw new Error('Network response was not ok');
                 const result = await response.json();
